@@ -46,28 +46,33 @@ void pre_auton(void) {
   // Example: clearing encoders, setting servo positions, ...
 }
 
-void setallright (double speed) {
+void setallright (double speed) { //sets velocity of all the right-side motors on the robot base
   frontright.setVelocity(speed, percent);
   centerright.setVelocity(speed, percent);
   backright.setVelocity(speed, percent);
 }
 
-void setallleft (double speed) {
+void setallleft (double speed) { //sets the velocity of all the left-side motors on the robot base
   frontleft.setVelocity(speed, percent);
   centerleft.setVelocity(speed, percent);
   backleft.setVelocity(speed, percent);
 }
 
-void spinallright () {
+void spinallright () { //spins all the right-side motors on the robot base
   frontright.spin(forward);
   centerright.spin(forward);
   backright.spin(forward);
 }
 
-void spinallleft () {
+void spinallleft () { //spins all the left-side motors on the robot base
   frontleft.spin(forward);
   centerleft.spin(forward);
   backleft.spin(forward);
+}
+
+void spinall () { //spins all the motors on the robot base
+  spinallleft();
+  spinallright();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -95,20 +100,22 @@ void autonomous(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-int y;
-int x;
-int leftspeed;
-int rightspeed;
+int y; //y direction (front-back) as from the joystick
+int x; //x direction (turning) as from the joystick
+int threshold; //"dead zone" of joysticks
+int leftspeed; //calculated speed of left side of the base
+int rightspeed; //calculated speed of right side of the base
 
 void usercontrol(void) {
   while (1) {
     y = Controller1.Axis3.position(percent);
     x = Controller1.Axis4.position(percent);
 
-    if (x <= 10 && x >= -10) {
+    if (x <= threshold && x >= -threshold) {
       x = 0;
     }
-    if (y <= 10 && y >= -10) {
+    
+    if (y <= threshold && y >= -threshold) {
       y = 0;
     }
 
@@ -118,11 +125,9 @@ void usercontrol(void) {
     setallleft(leftspeed);
     setallright(rightspeed);
 
-    spinallleft();
-    spinallright();
+    spinall();
 
-    wait(10, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+    wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
 
